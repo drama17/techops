@@ -1,0 +1,6 @@
+image:
+  repository: <your-ecr-repo>
+  tag: latest
+service:
+  type: LoadBalancer
+namespace: dev

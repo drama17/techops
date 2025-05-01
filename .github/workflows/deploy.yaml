@@ -1,0 +1,52 @@
+name: Deploy to EKS
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    name: Build and Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Set up kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: v1.32.0
+
+      - name: Set up Helm
+        uses: azure/setup-helm@v4.3.0
+        with:
+          version: "latest"
+        id: install
+
+      - name: Authenticate to EKS
+        run: |
+          aws eks update-kubeconfig --region ${{ vars.AWS_REGION }} --name hello-eks-cluster
+
+      - name: Set image tag
+        id: vars
+        run: echo "tag=${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ vars.ECR_REPO }}:${{ steps.vars.outputs.tag }} -t ${{ vars.ECR_REPO }}:latest .
+          aws ecr get-login-password | docker login --username AWS --password-stdin ${{ vars.ECR_REPO }}
+          docker push ${{ vars.ECR_REPO }}:${{ steps.vars.outputs.tag }}
+          docker push ${{ vars.ECR_REPO }}:latest
+
+      - name: Deploy app with Helm
+        run: |
+          helm upgrade --install hello-app ./helm-chart --set image.repository=${{ vars.ECR_REPO }} --set image.tag=${{ steps.vars.outputs.tag }}
