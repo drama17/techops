@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: hello-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hello-app
+  template:
+    metadata:
+      labels:
+        app: hello-app
+      annotations:
+        vault.hashicorp.com/agent-inject: "true"
+        vault.hashicorp.com/role: "hello-app-role"
+        vault.hashicorp.com/agent-inject-secret-env: "secret/data/hello-app/config"
+        vault.hashicorp.com/agent-inject-template-env: |
+          {{- with secret "secret/data/hello-app/config" -}}
+          export DATABASE_URL="{{ .Data.data.DATABASE_URL }}"
+          export API_KEY="{{ .Data.data.API_KEY }}"
+          {{- end }}
+    spec:
+      serviceAccountName: hello-app-sa
+      containers:
+      - name: hello-app
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        command: ["/bin/sh"]
+        args: ["-c", "source /vault/secrets/env && python main.py"]
+        ports:
+        - containerPort: 80
