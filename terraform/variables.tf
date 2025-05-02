@@ -5,23 +5,23 @@ variable "eks_version" {
 variable "account_id" {
   description = "AWS account id"
   type        = string
-  default = "521673981163"
+  default     = "521673981163"
 }
 
 variable "region" {
   description = "AWS region"
   type        = string
-  default = "eu-west-1"
+  default     = "eu-west-1"
 }
 
 variable "zones" {
   description = "AWS zones"
   type        = set(string)
-  default = ["eu-west-1-a", "eu-west-1-b"]
+  default     = ["eu-west-1a", "eu-west-1b"]
 }
 
-variable "s3_bucket" {
+variable "s3_bucket_tfstate" {
   description = "S3 bucket for storing Terraform state"
   type        = string
-  default = "hw_s3"
+  default     = "hw-s3-tfstate"
 }

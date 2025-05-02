@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+venv/
+.env/
+.venv/
+
+# Git and build metadata
+.git/
+.github/
+.gitignore
+Dockerfile
+.dockerignore
+
+# OS / Editor / IDE
+*.log
+*.swp
+*.swo
+.idea/
+.vscode/
+*.DS_Store
+
+# Project folders
+
+terraform/
+helm-chart

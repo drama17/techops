@@ -3,7 +3,7 @@ name: Deploy to EKS
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   deploy:
@@ -19,33 +19,38 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
         with:
-          version: v1.29.0
+          version: v1.32.0
 
       - name: Set up Helm
         uses: azure/setup-helm@v3
         with:
-          version: v3.13.0
+          version: v4.3.0
 
       - name: Authenticate to EKS
         run: |
-          aws eks update-kubeconfig --region us-east-1 --name hello-eks
+          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name hello-eks
 
       - name: Install Vault if not present
         run: |
           helm repo add hashicorp https://helm.releases.hashicorp.com
           helm upgrade --install vault hashicorp/vault --set "server.dev.enabled=true,injector.enabled=true"
 
+      - name: Set image tag
+        id: vars
+        run: echo "tag=${{ github.run_number }}" >> "$GITHUB_OUTPUT"
+
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.ECR_REPO }}:latest .
+          docker build -t ${{ secrets.ECR_REPO }}:${{ steps.vars.outputs.tag }} .
+          docker tag  ${{ secrets.ECR_REPO }}:${{ steps.vars.outputs.tag }} ${{ secrets.ECR_REPO }}:latest
           aws ecr get-login-password | docker login --username AWS --password-stdin ${{ secrets.ECR_REPO }}
-          docker push ${{ secrets.ECR_REPO }}:latest
+          docker push ${{ secrets.ECR_REPO }}:${{ steps.vars.outputs.tag }} ${{ secrets.ECR_REPO }}:latest
 
       - name: Deploy app with Helm
         run: |
-          helm upgrade --install hello-app ./helm-chart --set image.repository=${{ secrets.ECR_REPO }}             --set image.tag=latest
+          helm upgrade --install hello-app ./helm-chart --set image.repository=${{ secrets.ECR_REPO }} --set image.tag=${{ steps.vars.outputs.tag }}
