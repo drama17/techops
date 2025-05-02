@@ -27,7 +27,7 @@ jobs:
           version: v1.32.0
 
       - name: Set up Helm
-        uses: aazure/setup-helm@v4.3.0
+        uses: azure/setup-helm@v4.3.0
         with:
           version: v4.3.0
 
