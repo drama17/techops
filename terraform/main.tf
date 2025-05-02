@@ -43,7 +43,7 @@ module "eks" {
   enable_irsa     = true
   access_entries = {
     github-actions = {
-      principal_arn     = "arn:aws:iam::521673981163:user/aws-admin"
+      principal_arn     = "arn:aws:iam::521673981163:user/github-actions"
       kubernetes_groups = ["eks-admins"]
       policy_associations = {
         github-actions = {
