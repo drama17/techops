@@ -50,4 +50,4 @@ jobs:
 
       - name: Deploy app with Helm
         run: |
-          helm upgrade --install hello-app ./helm-chart --namespace dev --create-namespace --set image.repository=${{ vars.ECR_REPO }} --set image.tag=${{ steps.vars.outputs.tag }}
+          helm upgrade --install hello-app ./helm-chart --set image.repository=${{ vars.ECR_REPO }} --set image.tag=${{ steps.vars.outputs.tag }}
