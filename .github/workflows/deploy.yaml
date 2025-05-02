@@ -34,7 +34,7 @@ jobs:
 
       - name: Authenticate to EKS
         run: |
-          aws eks update-kubeconfig --region ${{ vars.AWS_REGION }} --name hello-eks
+          aws eks update-kubeconfig --region ${{ vars.AWS_REGION }} --name hello-eks-cluster
 
       - name: Install Vault if not present
         run: |
