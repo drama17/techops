@@ -36,11 +36,6 @@ jobs:
         run: |
           aws eks update-kubeconfig --region ${{ vars.AWS_REGION }} --name hello-eks-cluster
 
-      - name: Install Vault if not present
-        run: |
-          helm repo add hashicorp https://helm.releases.hashicorp.com
-          helm upgrade --install vault hashicorp/vault --set "server.dev.enabled=true,injector.enabled=true"
-
       - name: Set image tag
         id: vars
         run: echo "tag=${{ github.run_number }}" >> "$GITHUB_OUTPUT"
