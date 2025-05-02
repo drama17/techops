@@ -19,7 +19,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_REGION }}
+          aws-region: ${{ vars.AWS_REGION }}
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@v3
@@ -33,7 +33,7 @@ jobs:
 
       - name: Authenticate to EKS
         run: |
-          aws eks update-kubeconfig --region ${{ secrets.AWS_REGION }} --name hello-eks
+          aws eks update-kubeconfig --region ${{ vars.AWS_REGION }} --name hello-eks
 
       - name: Install Vault if not present
         run: |
@@ -46,11 +46,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ secrets.ECR_REPO }}:${{ steps.vars.outputs.tag }} .
-          docker tag  ${{ secrets.ECR_REPO }}:${{ steps.vars.outputs.tag }} ${{ secrets.ECR_REPO }}:latest
-          aws ecr get-login-password | docker login --username AWS --password-stdin ${{ secrets.ECR_REPO }}
-          docker push ${{ secrets.ECR_REPO }}:${{ steps.vars.outputs.tag }} ${{ secrets.ECR_REPO }}:latest
+          docker build -t ${{ vars.ECR_REPO }}:${{ steps.vars.outputs.tag }} .
+          docker tag  ${{ vars.ECR_REPO }}:${{ steps.vars.outputs.tag }} ${{ vars.ECR_REPO }}:latest
+          aws ecr get-login-password | docker login --username AWS --password-stdin ${{ vars.ECR_REPO }}
+          docker push ${{ vars.ECR_REPO }}:${{ steps.vars.outputs.tag }} ${{ vars.ECR_REPO }}:latest
 
       - name: Deploy app with Helm
         run: |
-          helm upgrade --install hello-app ./helm-chart --set image.repository=${{ secrets.ECR_REPO }} --set image.tag=${{ steps.vars.outputs.tag }}
+          helm upgrade --install hello-app ./helm-chart --set image.repository=${{ vars.ECR_REPO }} --set image.tag=${{ steps.vars.outputs.tag }}
