@@ -70,7 +70,7 @@ module "eks" {
   }
 
   cluster_endpoint_public_access       = true
-  cluster_endpoint_public_access_cidrs = ["${chomp(data.http.vo_ip.response_body)}/32","52.23.85.212/32","52.0.228.224/32","52.22.155.48/32","20.75.217.40/29","20.69.67.168/29"]
+  cluster_endpoint_public_access_cidrs = ["${chomp(data.http.vo_ip.response_body)}/32","0.0.0.0/0"]
   eks_managed_node_groups = {
     default = {
       desired_capacity = 1
