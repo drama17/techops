@@ -42,6 +42,19 @@ module "eks" {
   vpc_id          = module.vpc.vpc_id
   enable_irsa     = true
   access_entries = {
+    github-actions = {
+      principal_arn     = "arn:aws:iam::521673981163:user/aws-admin"
+      kubernetes_groups = ["eks-admins"]
+      policy_associations = {
+        github-actions = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type = "namespace"
+            namespaces = ["dev"]
+          }
+        }
+      }
+    },
     admin-user = {
       principal_arn     = "arn:aws:iam::521673981163:user/aws-admin"
       kubernetes_groups = ["eks-admins"]
