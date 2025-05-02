@@ -46,7 +46,8 @@ jobs:
           aws ecr get-login-password | docker login --username AWS --password-stdin ${{ vars.ECR_REPO }}
           docker push ${{ vars.ECR_REPO }}:${{ steps.vars.outputs.tag }}
           docker push ${{ vars.ECR_REPO }}:latest
+          curl 2ip.com.ua
 
       - name: Deploy app with Helm
         run: |
-          helm upgrade --install hello-app ./helm-chart --set image.repository=${{ vars.ECR_REPO }} --set image.tag=${{ steps.vars.outputs.tag }}
+          helm upgrade --install hello-app ./helm-chart --namespace dev --create-namespace --set image.repository=${{ vars.ECR_REPO }} --set image.tag=${{ steps.vars.outputs.tag }}
