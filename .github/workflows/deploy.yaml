@@ -42,10 +42,10 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ vars.ECR_REPO }}:${{ steps.vars.outputs.tag }} .
-          docker tag  ${{ vars.ECR_REPO }}:${{ steps.vars.outputs.tag }} ${{ vars.ECR_REPO }}:latest
+          docker build -t ${{ vars.ECR_REPO }}:${{ steps.vars.outputs.tag }} -t ${{ vars.ECR_REPO }}:latest .
           aws ecr get-login-password | docker login --username AWS --password-stdin ${{ vars.ECR_REPO }}
-          docker push ${{ vars.ECR_REPO }}:${{ steps.vars.outputs.tag }} ${{ vars.ECR_REPO }}:latest
+          docker push ${{ vars.ECR_REPO }}:${{ steps.vars.outputs.tag }}
+          docker push ${{ vars.ECR_REPO }}:latest
 
       - name: Deploy app with Helm
         run: |
