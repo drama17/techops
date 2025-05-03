@@ -95,12 +95,3 @@ resource "aws_ecr_repository" "hello_world" {
     Environment = "dev"
   }
 }
-
-resource "time_static" "current" {}
-resource "null_resource" "kubeconfig" {
-  provisioner "local-exec" {
-    command = "aws eks --region ${var.region} update-kubeconfig --name ${module.eks.cluster_name}"
-  }
-
-  depends_on = [module.eks]
-}

@@ -18,10 +18,7 @@ resource "aws_iam_user_policy" "github_actions_policy" {
         Action = [
           "ecr:*",
           "eks:*",
-          "ec2:Describe*",
-          "eks:Describe*",
-          "iam:PassRole",
-          "s3:*"
+          "ec2:Describe*"
         ]
         Resource = "*"
       }
