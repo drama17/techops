@@ -16,17 +16,17 @@ module "vpc" {
   enable_dns_support   = true
 
   tags = {
-    "kubernetes.io/cluster/hello-eks-cluster" = "shared"
+    "kubernetes.io/cluster/${var.project_name}-cluster" = "shared"
   }
 
   public_subnet_tags = {
-    "kubernetes.io/role/elb"                  = "1"
-    "kubernetes.io/cluster/hello-eks-cluster" = "shared"
+    "kubernetes.io/cluster/${var.project_name}-cluster" = "shared"
+    "kubernetes.io/role/elb"                            = "1"
   }
-
+  
   private_subnet_tags = {
-    "kubernetes.io/role/internal-elb"         = "1"
-    "kubernetes.io/cluster/hello-eks-cluster" = "shared"
+    "kubernetes.io/cluster/${var.project_name}-cluster" = "shared"
+    "kubernetes.io/role/internal-elb"                   = "1"
   }
 }
 
