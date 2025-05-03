@@ -67,7 +67,7 @@ jobs:
 
       - name: Authenticate to EKS
         run: |
-          aws eks update-kubeconfig --region ${{ vars.AWS_REGION }} --name hello-eks-cluster
+          aws eks update-kubeconfig --region ${{ vars.AWS_REGION }} --name techops-cluster
 
       # Set up Docker Buildx for faster builds with caching
       - name: Set up Docker Buildx
