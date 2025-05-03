@@ -18,6 +18,15 @@ jobs:
         with:
           fetch-depth: 0  # Get the whole history for the changes check
 
+      - name: Check if previous deploy failed
+        id: check_previous_failed
+        run: |
+          if [ -f .deploy_failed ]; then
+            echo "app_changed=false" >> $GITHUB_OUTPUT
+            echo "Previous deploy failed. Skipping further checks."
+            exit 0
+          fi
+
       - name: Check for changes in app directory
         id: check_app_changes
         run: |
@@ -103,8 +112,8 @@ jobs:
           helm upgrade --install hello-app ./helm-chart \
             --set image.repository=${{ vars.ECR_REPO }} \
             --set image.tag=${{ steps.vars.outputs.tag }} \
-            --set gitCommit=${{ steps.vars.outputs.sha_short }} \
-            --atomic
+            --set gitCommit=${{ steps.vars.outputs.sha_short }}
+
       # Notify on success (for example, to Slack)
       # - name: Notify deployment status
       #   if: always()
