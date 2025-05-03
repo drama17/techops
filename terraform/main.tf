@@ -2,15 +2,16 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "5.21.0"
 
-  name = "eks-vpc"
-  cidr = "10.0.0.0/16"
+  name = "${var.project_name}-vpc"
+  cidr = var.vpc_cidr
 
-  azs             = var.zones
-  private_subnets = ["10.0.1.0/24", "10.0.2.0/24"]
-  public_subnets  = ["10.0.101.0/24", "10.0.102.0/24"]
+  azs             = var.availability_zones
+  private_subnets = var.private_subnet_cidrs
+  public_subnets  = var.public_subnet_cidrs
 
   enable_nat_gateway   = true
-  single_nat_gateway   = true
+  single_nat_gateway     = var.environment != "production"
+  one_nat_gateway_per_az = var.environment == "production"
   enable_dns_hostnames = true
   enable_dns_support   = true
 
@@ -36,8 +37,8 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "20.36.0"
 
-  cluster_name    = "hello-eks-cluster"
-  cluster_version = var.eks_version
+  cluster_name    = "${var.project_name}-cluster"
+  cluster_version = var.kubernetes_version
   subnet_ids      = module.vpc.private_subnets
   vpc_id          = module.vpc.vpc_id
   enable_irsa     = true
@@ -79,6 +80,17 @@ module "eks" {
       instance_types   = ["t2.medium"]
     }
   }
+  cluster_addons = {
+    coredns = {
+      most_recent = true
+    }
+    kube-proxy = {
+      most_recent = true
+    }
+    vpc-cni = {
+      most_recent = true
+    }
+  }
 }
 
 resource "aws_ecr_repository" "hello_world" {
@@ -94,4 +106,24 @@ resource "aws_ecr_repository" "hello_world" {
     Name        = "hello_world"
     Environment = "dev"
   }
+}
+resource "aws_ecr_lifecycle_policy" "app" {
+  repository = aws_ecr_repository.hello_world.name
+
+  policy = jsonencode({
+    rules = [
+      {
+        rulePriority = 1
+        description  = "Keep last 10 images"
+        selection = {
+          tagStatus     = "any"
+          countType     = "imageCountMoreThan"
+          countNumber   = 10
+        }
+        action = {
+          type = "expire"
+        }
+      }
+    ]
+  })
 }
