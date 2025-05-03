@@ -162,8 +162,8 @@ Key challenges included setting up the correct IAM permissions for GitHub Action
 With more time, enhancements would include:
  - logging/monitoring (e.g., Prometheus/Grafana+ELK)
  - using IRSA and Vault for secrets
- - optimizing cost by scaling node groups, using saving plans
+ - optimizing cost by scaling node groups, using saving plans, spot instances for non-production envs
  - creating DNS record for fine access
- - adding CDN provider for better performance, redusing costs and better defense from DDOS and etc.
+ - adding CDN provider for better performance, redusing costs (caching static data reduce the traffic) and better defense from DDOS and etc.
 
 ---

@@ -112,7 +112,8 @@ jobs:
           helm upgrade --install hello-app ./helm-chart \
             --set image.repository=${{ vars.ECR_REPO }} \
             --set image.tag=${{ steps.vars.outputs.tag }} \
-            --set gitCommit=${{ steps.vars.outputs.sha_short }}
+            --set gitCommit=${{ steps.vars.outputs.sha_short }} \
+            --atomic
 
       # Notify on success (for example, to Slack)
       # - name: Notify deployment status
